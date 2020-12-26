@@ -2,19 +2,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Loading from 'react-loading';
 import { FormHandles } from '@unform/core';
-// import { Form } from '@unform/web';
-// import * as Yup from 'yup';
+import { Form } from '@unform/web';
 import { useHistory, useLocation } from 'react-router-dom';
-
 import { FiArrowUp } from 'react-icons/fi';
+import { useLead } from '../../hooks/lead';
+
 import api from '../../services/api';
 
-import { useToast } from '../../hooks/toast';
-
-// import getValidationErrors from '../../utils/getValidationErrors';
-
-// import Input from '../../components/Input';
-// import Button from '../../components/Button';
+import InputEditable from '../../components/InputEditable';
 import Main from '../../components/Main';
 import Section from '../../components/Section';
 import AppHeader from '../../components/AppHeader';
@@ -25,7 +20,7 @@ import AppHeader from '../../components/AppHeader';
  * [ ] Finish Card section font styles(color, margin, size)
  * [ ] Build the cards section with API & Lead Information
  * (check lead interface to review the fields separated)
- * [ ] Create a way to update the lead and cancel/submit the update
+ * [X] Create a way to update the lead and cancel/submit the update
  * (probably will be lots of code, so do it in a "components" folder)
  */
 
@@ -41,65 +36,72 @@ interface Lead {
   usdot: string;
 
   // Personal info
-  companyName: string | null;
-  fullName: string | null;
-  entityType: string | null;
-  phoneNumber: string | null;
-  operatingStatus: string | null;
-  email: string | null;
+  companyName: string | undefined;
+  fullName: string | undefined;
+  entityType: string | undefined;
+  phoneNumber: string | undefined;
+  operatingStatus: string | undefined;
+  email: string | undefined;
 
   // Address
-  primaryAddress: string | null;
-  state: string | null;
-  zipCode: string | null;
-  altAddress: string | null;
-  altState: string | null;
-  altZipCode: string | null;
+  primaryAddress: string | undefined;
+  state: string | undefined;
+  zipCode: string | undefined;
+  altAddress: string | undefined;
+  altState: string | undefined;
+  altZipCode: string | undefined;
 
   // Driver info
-  mcs150FormDate: string | null;
-  operationClassification: string | null;
-  carrierOperation: string | null;
-  cargoCarried: string | null;
-  drivers: string | null;
-  powerUnits: string | null;
+  mcs150FormDate: string | undefined;
+  operationClassification: string | undefined;
+  carrierOperation: string | undefined;
+  cargoCarried: string | undefined;
+  drivers: string | undefined;
+  powerUnits: string | undefined;
 
   // Insurance
-  bipdInsuranceRequired: string | null;
-  cargoInsuranceRequired: string | null;
-  bondInsuranceRequired: string | null;
-  insuranceCarrier: string | null;
-  policySurety: string | null;
-  postedDate: string | null;
-  coverageFrom: string | null;
-  coverageTo: string | null;
-  effectiveDate: string | null;
-  cancellationDate: string | null;
+  bipdInsuranceRequired: string | undefined;
+  cargoInsuranceRequired: string | undefined;
+  bondInsuranceRequired: string | undefined;
+  insuranceCarrier: string | undefined;
+  policySurety: string | undefined;
+  postedDate: string | undefined;
+  coverageFrom: string | undefined;
+  coverageTo: string | undefined;
+  effectiveDate: string | undefined;
+  cancellationDate: string | undefined;
 }
 
 const Lead: React.FC = () => {
   const location = useLocation();
-  // const history = useHistory();
 
-  // const formRef = useRef<FormHandles>(null);
-  // const { addToast } = useToast();
+  const formRef = useRef<FormHandles>(null);
+
+  const {
+    reloadLead,
+    setLeadUpdateEndpoint,
+    isLoading,
+    setIsLoading,
+  } = useLead();
 
   const [isPersonalExpanded, setIsPersonalExpanded] = useState(true);
 
   const [leadId, setLeadId] = useState<string>();
   const [lead, setLead] = useState<Lead>();
-  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    setLeadId(location.pathname.split('/').splice(-1).pop());
-  }, [location]);
+    const id = location.pathname.split('/').splice(-1).pop();
+
+    setLeadId(id);
+    setLeadUpdateEndpoint(`/leads/${id}`);
+  }, [location, setLeadUpdateEndpoint]);
 
   useEffect(() => {
     api.get(`/leads/${leadId}`).then(response => {
       setLead(response.data);
       setIsLoading(false);
     });
-  }, [leadId]);
+  }, [leadId, reloadLead, setIsLoading]);
 
   return (
     <>
@@ -123,29 +125,43 @@ const Lead: React.FC = () => {
             </CardHeader>
 
             <Main>
-              <Section>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-              </Section>
+              <Form ref={formRef} onSubmit={() => {}}>
+                <Section>
+                  <InputEditable
+                    text="Company Name"
+                    name="companyName"
+                    defaultValue={lead.companyName}
+                  />
+                  <InputEditable
+                    text="Full Name"
+                    name="fullName"
+                    defaultValue={lead.fullName}
+                  />
+                  <InputEditable
+                    text="Entity Type"
+                    name="entityType"
+                    defaultValue={lead.entityType}
+                  />
+                </Section>
 
-              <Section>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-                <p>
-                  <strong>Field Name:&nbsp;</strong> Field Value
-                </p>
-              </Section>
+                <Section>
+                  <InputEditable
+                    text="Phone Number"
+                    name="phoneNumber"
+                    defaultValue={lead.phoneNumber}
+                  />
+                  <InputEditable
+                    text="Operating Status"
+                    name="operatingStatus"
+                    defaultValue={lead.operatingStatus}
+                  />
+                  <InputEditable
+                    text="E-mail"
+                    name="email"
+                    defaultValue={lead.email}
+                  />
+                </Section>
+              </Form>
             </Main>
           </InformationCard>
         ) : (

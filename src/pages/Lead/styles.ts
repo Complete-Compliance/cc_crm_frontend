@@ -4,6 +4,10 @@ interface InformationCardProps {
   isExpanded: boolean;
 }
 
+interface CardHeaderProps {
+  isExpanded: boolean;
+}
+
 export const Container = styled.div`
   display: flex;
   align-items: center;
@@ -41,34 +45,45 @@ export const InformationCard = styled.div<InformationCardProps>`
   background-color: #28262e;
 
   border-radius: 20px;
-
-  section {
+  form {
+    width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+
+    section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      div + div {
+        margin-top: 6px;
+      }
+    }
   }
 
   ${props =>
     props.isExpanded
       ? css`
-          height: 15em;
+          height: 18em;
           transition: all 0.5s ease-in-out;
-
-          section {
-            animation: ${blurEffectIn} 0.7s;
+          form {
+            section {
+              animation: ${blurEffectIn} 0.7s;
+            }
           }
         `
       : css`
           height: 3em;
           transition: all 0.5s ease-in-out;
-
-          section {
-            opacity: 0;
+          form {
+            section {
+              opacity: 0;
+            }
           }
         `}
 
   @media (min-width: 1024px) {
-    width: 30em;
+    width: 60em;
   }
 `;
 
@@ -76,7 +91,7 @@ export const InformationCard = styled.div<InformationCardProps>`
 // on the HTML I would be using a UP ARROW and
 // that all the cards would start with expanded=True
 // if one thing change, the logic will invert
-export const CardHeader = styled.div<InformationCardProps>`
+export const CardHeader = styled.div<CardHeaderProps>`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
