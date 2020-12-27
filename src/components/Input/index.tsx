@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-one-expression-per-line */
 import React, {
   InputHTMLAttributes,
   useEffect,
@@ -14,6 +15,7 @@ import { Container, Error } from './styles';
 interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
   containerStyle?: object;
+  text?: string;
   icon?: React.ComponentType<IconBaseProps>;
 }
 
@@ -21,6 +23,7 @@ const Input: React.FC<InputProps> = ({
   name,
   containerStyle = {},
   icon: Icon,
+  text,
   ...props
 }) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -34,14 +37,12 @@ const Input: React.FC<InputProps> = ({
     setIsFocused(true);
   }, []);
 
-  // This is for when I want to left the icon with color if any value was written in it
   const handleInputBlur = useCallback(() => {
     setIsFocused(false);
 
     setisFilled(!!inputRef.current?.value);
   }, []);
 
-  // Below is to use unform on our forms. We register it so it can get values
   useEffect(() => {
     registerField({
       name: fieldName,
@@ -58,6 +59,7 @@ const Input: React.FC<InputProps> = ({
       isFocused={isFocused}
     >
       {Icon && <Icon size={20} />}
+      {text && <strong>{`${text}:`}&nbsp;</strong>}
       <input
         name={name}
         onFocus={handleInputFocus}
