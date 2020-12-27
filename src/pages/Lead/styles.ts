@@ -2,6 +2,7 @@ import styled, { keyframes, css } from 'styled-components';
 
 interface InformationCardProps {
   isExpanded: boolean;
+  height?: string;
 }
 
 interface CardHeaderProps {
@@ -11,17 +12,8 @@ interface CardHeaderProps {
 export const Container = styled.div`
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   flex-direction: column;
-
-  h1 {
-    position: fixed;
-    top: 120px;
-
-    strong {
-      color: #ba382f;
-    }
-  }
 
   height: 80vh;
 `;
@@ -40,9 +32,26 @@ const blurEffectIn = keyframes`
   }
 `;
 
+export const LeadCardsContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  margin-top: 1em;
+
+  h1 {
+    strong {
+      color: #ba382f;
+    }
+  }
+`;
+
 export const InformationCard = styled.div<InformationCardProps>`
   width: 20em;
   background-color: #28262e;
+
+  margin: 1em 0;
 
   border-radius: 20px;
   form {
@@ -64,7 +73,7 @@ export const InformationCard = styled.div<InformationCardProps>`
   ${props =>
     props.isExpanded
       ? css`
-          height: 18em;
+          height: ${props.height ? props.height : '18em'};
           transition: all 0.5s ease-in-out;
           form {
             section {

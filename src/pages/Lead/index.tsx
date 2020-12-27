@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Loading from 'react-loading';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import { FiArrowUp } from 'react-icons/fi';
 import { useLead } from '../../hooks/lead';
 
@@ -14,19 +14,10 @@ import Main from '../../components/Main';
 import Section from '../../components/Section';
 import AppHeader from '../../components/AppHeader';
 
-/**
- * WHAT NEEDS TO BE DONE IN THIS PAGE:
- *
- * [ ] Finish Card section font styles(color, margin, size)
- * [ ] Build the cards section with API & Lead Information
- * (check lead interface to review the fields separated)
- * [X] Create a way to update the lead and cancel/submit the update
- * (probably will be lots of code, so do it in a "components" folder)
- */
-
 import {
   Container,
   LoadingContainer,
+  LeadCardsContainer,
   InformationCard,
   CardHeader,
 } from './styles';
@@ -85,6 +76,9 @@ const Lead: React.FC = () => {
   } = useLead();
 
   const [isPersonalExpanded, setIsPersonalExpanded] = useState(true);
+  const [isAddressExpanded, setIsAddressExpanded] = useState(true);
+  const [isDriverExpanded, setIsDriverExpanded] = useState(true);
+  const [isInsuranceExpanded, setIsInsuranceExpanded] = useState(true);
 
   const [leadId, setLeadId] = useState<string>();
   const [lead, setLead] = useState<Lead>();
@@ -107,63 +101,248 @@ const Lead: React.FC = () => {
     <>
       <AppHeader />
       <Container>
-        {!isLoading && lead && (
-          <h1>
-            Lead USDOT <strong>#{lead.usdot}</strong>
-          </h1>
-        )}
         {!isLoading && lead ? (
-          <InformationCard isExpanded={isPersonalExpanded}>
-            <CardHeader isExpanded={isPersonalExpanded}>
-              <span>Personal Information</span>
-              <button
-                type="button"
-                onClick={() => setIsPersonalExpanded(!isPersonalExpanded)}
-              >
-                <FiArrowUp />
-              </button>
-            </CardHeader>
+          <LeadCardsContainer>
+            <h1>
+              Lead USDOT <strong>#{lead.usdot}</strong>
+            </h1>
 
-            <Main>
-              <Form ref={formRef} onSubmit={() => {}}>
-                <Section>
-                  <InputEditable
-                    text="Company Name"
-                    name="companyName"
-                    defaultValue={lead.companyName}
-                  />
-                  <InputEditable
-                    text="Full Name"
-                    name="fullName"
-                    defaultValue={lead.fullName}
-                  />
-                  <InputEditable
-                    text="Entity Type"
-                    name="entityType"
-                    defaultValue={lead.entityType}
-                  />
-                </Section>
+            <InformationCard id="Personal" isExpanded={isPersonalExpanded}>
+              <CardHeader isExpanded={isPersonalExpanded}>
+                <span>Personal Information</span>
+                <button
+                  type="button"
+                  onClick={() => setIsPersonalExpanded(!isPersonalExpanded)}
+                >
+                  <FiArrowUp />
+                </button>
+              </CardHeader>
 
-                <Section>
-                  <InputEditable
-                    text="Phone Number"
-                    name="phoneNumber"
-                    defaultValue={lead.phoneNumber}
-                  />
-                  <InputEditable
-                    text="Operating Status"
-                    name="operatingStatus"
-                    defaultValue={lead.operatingStatus}
-                  />
-                  <InputEditable
-                    text="E-mail"
-                    name="email"
-                    defaultValue={lead.email}
-                  />
-                </Section>
-              </Form>
-            </Main>
-          </InformationCard>
+              <Main>
+                <Form ref={formRef} onSubmit={() => {}}>
+                  <Section>
+                    <InputEditable
+                      text="Company Name"
+                      name="companyName"
+                      defaultValue={lead.companyName}
+                    />
+                    <InputEditable
+                      text="Full Name"
+                      name="fullName"
+                      defaultValue={lead.fullName}
+                    />
+                    <InputEditable
+                      text="Entity Type"
+                      name="entityType"
+                      defaultValue={lead.entityType}
+                    />
+                  </Section>
+
+                  <Section>
+                    <InputEditable
+                      text="Phone Number"
+                      name="phoneNumber"
+                      defaultValue={lead.phoneNumber}
+                    />
+                    <InputEditable
+                      text="Operating Status"
+                      name="operatingStatus"
+                      defaultValue={lead.operatingStatus}
+                    />
+                    <InputEditable
+                      text="E-mail"
+                      name="email"
+                      defaultValue={lead.email}
+                    />
+                  </Section>
+                </Form>
+              </Main>
+            </InformationCard>
+
+            <InformationCard id="Address" isExpanded={isAddressExpanded}>
+              <CardHeader isExpanded={isAddressExpanded}>
+                <span>Addresses</span>
+                <button
+                  type="button"
+                  onClick={() => setIsAddressExpanded(!isAddressExpanded)}
+                >
+                  <FiArrowUp />
+                </button>
+              </CardHeader>
+
+              <Main>
+                <Form ref={formRef} onSubmit={() => {}}>
+                  <Section>
+                    <InputEditable
+                      text="Primary Address"
+                      name="primaryAddress"
+                      defaultValue={lead.primaryAddress}
+                    />
+                    <InputEditable
+                      text="State"
+                      name="state"
+                      defaultValue={lead.state}
+                    />
+                    <InputEditable
+                      text="Primary Postal Code"
+                      name="zipCode"
+                      defaultValue={lead.zipCode}
+                    />
+                  </Section>
+
+                  <Section>
+                    <InputEditable
+                      text="Alt. Address"
+                      name="altAddress"
+                      defaultValue={lead.altAddress}
+                    />
+                    <InputEditable
+                      text="Alt. State"
+                      name="altState"
+                      defaultValue={lead.altState}
+                    />
+                    <InputEditable
+                      text="Alt. Zip Code"
+                      name="altZipCode"
+                      defaultValue={lead.altZipCode}
+                    />
+                  </Section>
+                </Form>
+              </Main>
+            </InformationCard>
+
+            <InformationCard id="Driver" isExpanded={isDriverExpanded}>
+              <CardHeader isExpanded={isDriverExpanded}>
+                <span>Driver Information</span>
+                <button
+                  type="button"
+                  onClick={() => setIsDriverExpanded(!isDriverExpanded)}
+                >
+                  <FiArrowUp />
+                </button>
+              </CardHeader>
+
+              <Main>
+                <Form ref={formRef} onSubmit={() => {}}>
+                  <Section>
+                    <InputEditable
+                      text="MCS-150 Form Date"
+                      name="mcs150FormDate"
+                      defaultValue={lead.mcs150FormDate}
+                    />
+                    <InputEditable
+                      text="Operation Classification"
+                      name="operationClassification"
+                      defaultValue={lead.operationClassification}
+                    />
+                    <InputEditable
+                      text="Carrier Operation"
+                      name="carrierOperation"
+                      defaultValue={lead.carrierOperation}
+                    />
+                  </Section>
+
+                  <Section>
+                    <InputEditable
+                      text="Cargo Carried"
+                      name="cargoCarried"
+                      defaultValue={lead.cargoCarried}
+                    />
+                    <InputEditable
+                      text="Drivers"
+                      name="drivers"
+                      defaultValue={lead.drivers}
+                    />
+                    <InputEditable
+                      text="Power Units"
+                      name="powerUnits"
+                      defaultValue={lead.powerUnits}
+                    />
+                  </Section>
+                </Form>
+              </Main>
+            </InformationCard>
+
+            <InformationCard
+              id="Insurance"
+              isExpanded={isInsuranceExpanded}
+              height="25em"
+            >
+              <CardHeader isExpanded={isInsuranceExpanded}>
+                <span>Insurance</span>
+                <button
+                  type="button"
+                  onClick={() => setIsInsuranceExpanded(!isInsuranceExpanded)}
+                >
+                  <FiArrowUp />
+                </button>
+              </CardHeader>
+
+              <Main>
+                <Form ref={formRef} onSubmit={() => {}}>
+                  <Section>
+                    <InputEditable
+                      text="BIPD Insurance Required"
+                      name="bipdInsuranceRequired"
+                      defaultValue={lead.bipdInsuranceRequired}
+                    />
+                    <InputEditable
+                      text="Cargo Insurance Required"
+                      name="cargoInsuranceRequired"
+                      defaultValue={lead.cargoInsuranceRequired}
+                    />
+                    <InputEditable
+                      text="Bond Insurance Required"
+                      name="bondInsuranceRequired"
+                      defaultValue={lead.bondInsuranceRequired}
+                    />
+
+                    <InputEditable
+                      text="Insurance Carrier"
+                      name="insuranceCarrier"
+                      defaultValue={lead.insuranceCarrier}
+                    />
+
+                    <InputEditable
+                      text="Policy Surety"
+                      name="policySurety"
+                      defaultValue={lead.policySurety}
+                    />
+                  </Section>
+
+                  <Section>
+                    <InputEditable
+                      text="Posted Date"
+                      name="postedDate"
+                      defaultValue={lead.postedDate}
+                    />
+                    <InputEditable
+                      text="Coverage From"
+                      name="coverageFrom"
+                      defaultValue={lead.coverageFrom}
+                    />
+                    <InputEditable
+                      text="Coverage To"
+                      name="coverageTo"
+                      defaultValue={lead.coverageTo}
+                    />
+
+                    <InputEditable
+                      text="Effective Date"
+                      name="effectiveDate"
+                      defaultValue={lead.effectiveDate}
+                    />
+
+                    <InputEditable
+                      text="Cancelation Date"
+                      name="cancellationDate"
+                      defaultValue={lead.cancellationDate}
+                    />
+                  </Section>
+                </Form>
+              </Main>
+            </InformationCard>
+          </LeadCardsContainer>
         ) : (
           <LoadingContainer>
             <Loading type="spokes" color="white" height={150} width={75} />
