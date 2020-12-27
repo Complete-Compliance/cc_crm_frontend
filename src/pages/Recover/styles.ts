@@ -14,6 +14,7 @@ export const Content = styled.div`
   justify-content: center;
 
   width: 100%;
+  height: 100%;
 `;
 
 const appearFromRight = keyframes`
