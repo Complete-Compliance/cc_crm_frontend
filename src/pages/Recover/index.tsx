@@ -68,7 +68,6 @@ const Recover: React.FC = () => {
           abortEarly: false,
         });
 
-        // [ ] MAKE THIS ROUTE ON API
         const foundUser: User = await api.post('/users/find', { login, email });
 
         if (foundUser) {
