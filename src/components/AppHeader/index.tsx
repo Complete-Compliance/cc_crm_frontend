@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FiMenu, FiPower, FiX } from 'react-icons/fi';
-import { FaUserCircle } from 'react-icons/fa';
 import { isUuid } from 'uuidv4';
 import {
   Container,
@@ -51,6 +50,7 @@ const AppHeader: React.FC = () => {
               <Link to="/home">HOME</Link>
               <Link to="/leads">LEADS</Link>
               {user.type === 'admin' && <Link to="/recover">RECOVER</Link>}
+              {user.type === 'admin' && <Link to="/signup">REGISTER</Link>}
             </div>
           </MobileMenu>
 
@@ -75,9 +75,15 @@ const AppHeader: React.FC = () => {
               LEADS
             </Link>
             {user.type === 'admin' && (
-              <Link id="recover" to="/recover">
-                RECOVER
-              </Link>
+              <>
+                <Link id="recover" to="/recover">
+                  RECOVER
+                </Link>
+
+                <Link id="register" to="/signup">
+                  REGISTER
+                </Link>
+              </>
             )}
           </DesktopMenu>
 

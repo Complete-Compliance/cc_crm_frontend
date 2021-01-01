@@ -67,7 +67,7 @@ const SignUp: React.FC = () => {
           password,
         });
 
-        history.push('/');
+        history.push('/home');
 
         addToast({
           type: 'success',
@@ -129,9 +129,9 @@ const SignUp: React.FC = () => {
             <Button type="submit">SignUp</Button>
           </Form>
 
-          <Link to="/">
+          <Link to="/home">
             <FiArrowLeft />
-            Back to login
+            Return home
           </Link>
         </AnimatedContent>
       </Content>

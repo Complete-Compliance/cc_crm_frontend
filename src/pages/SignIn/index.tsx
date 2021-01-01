@@ -1,9 +1,9 @@
 import React, { useRef, useCallback } from 'react';
-import { FiLogIn, FiUser, FiLock } from 'react-icons/fi';
+import { FiUser, FiLock } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { Link, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useAuth } from '../../hooks/auth';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
@@ -87,11 +87,6 @@ const SignIn: React.FC = () => {
 
             <Button type="submit">SignIn</Button>
           </Form>
-
-          <Link to="/signup">
-            <FiLogIn />
-            Create a new account
-          </Link>
         </AnimationContainer>
       </Content>
       <Background />

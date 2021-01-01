@@ -278,5 +278,20 @@ export const DesktopMenu = styled.div<DesktopMenuProps>`
             }
           }
         `}
+
+        ${props =>
+          props.currentPage &&
+          props.currentPage === 'register' &&
+          css`
+            #leads {
+              color: #bab9b8;
+              border-bottom: 1px solid #ba382f;
+
+              &:hover {
+                color: #ba382f;
+                border-bottom: 1px solid #ba382f;
+              }
+            }
+          `}
   }
 `;
