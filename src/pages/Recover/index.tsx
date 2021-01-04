@@ -105,11 +105,16 @@ const Recover: React.FC = () => {
           abortEarly: false,
         });
 
+        if (!user) {
+          throw new Error('No user selected');
+        }
+
         const { password, passwordConfirmation } = data;
 
         await api.post('/users/reset', {
           password,
           passwordConfirmation,
+          id: user.id,
         });
 
         addToast({
