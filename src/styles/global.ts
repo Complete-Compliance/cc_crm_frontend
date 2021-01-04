@@ -42,4 +42,30 @@ export default createGlobalStyle`
   button {
     cursor: pointer;
   }
+
+  ::-webkit-scrollbar {
+    width: 0.4em;
+    height: 0.4em;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #28262e;
+  }
+
+  /* Track */
+  ::-webkit-scrollbar-track {
+    box-shadow: inset 0 0 5px #28262e;
+    border-radius: 10px;
+  }
+
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: #999591;
+    border-radius: 10px;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: #28262e;
+  }
 `;
