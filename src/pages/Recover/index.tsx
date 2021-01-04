@@ -140,7 +140,7 @@ const Recover: React.FC = () => {
         });
       }
     },
-    [addToast, history],
+    [addToast, history, user],
   );
 
   return (
