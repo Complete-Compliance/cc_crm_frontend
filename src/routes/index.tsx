@@ -14,9 +14,9 @@ import Lead from '../pages/Lead';
 const Routes: React.FC = () => (
   <Switch>
     <Route path="/" exact component={SignIn} />
-    <Route path="/signup" component={SignUp} />
 
     <Route path="/recover" component={Recover} isPrivate adminOnly />
+    <Route path="/signup" component={SignUp} isPrivate adminOnly />
     <Route path="/profile" component={Profile} isPrivate />
     <Route path="/home" component={Home} isPrivate />
     <Route path="/leads" component={Leads} isPrivate />
