@@ -127,7 +127,7 @@ const Leads: React.FC = () => {
           }}
           rows={leads}
           columns={columns}
-          pageSize={10}
+          pageSize={15}
           density="compact"
           headerHeight={40}
           scrollbarSize={7}

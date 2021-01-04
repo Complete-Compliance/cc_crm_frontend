@@ -39,10 +39,38 @@ export const LeadCardsContainer = styled.div`
   flex-direction: column;
 
   margin-top: 1em;
+`;
+
+export const LeadHeader = styled.div`
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
 
   h1 {
     strong {
       color: #ba382f;
+    }
+  }
+
+  button {
+    background: transparent;
+    border: 0;
+
+    svg {
+      margin: 1em 1.6em 0 0;
+
+      transition: all 0.6s;
+
+      color: #ba382f;
+
+      width: 30px;
+      height: 30px;
+    }
+
+    &:hover {
+      transform: scale(1.1);
     }
   }
 `;

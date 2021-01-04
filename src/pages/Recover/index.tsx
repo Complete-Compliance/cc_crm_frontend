@@ -4,7 +4,7 @@ import { FiLock, FiUser, FiMail } from 'react-icons/fi';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import * as Yup from 'yup';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useToast } from '../../hooks/toast';
 import getValidationErrors from '../../utils/getValidationErrors';
 
@@ -40,8 +40,6 @@ const Recover: React.FC = () => {
   const { addToast } = useToast();
   const history = useHistory();
 
-  const location = useLocation();
-
   const searchUser = useCallback(
     async (data: SearchUserData) => {
       try {
@@ -68,13 +66,9 @@ const Recover: React.FC = () => {
           abortEarly: false,
         });
 
-        const foundUser: User = await api.post('/users/find', { login, email });
-
-        if (foundUser) {
-          setUser(foundUser);
-        } else {
-          throw new Error('User not found with given information');
-        }
+        api.post('/users/find', { login, email }).then(response => {
+          setUser(response.data);
+        });
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -94,8 +88,7 @@ const Recover: React.FC = () => {
     [addToast],
   );
 
-  // [ ] Review this here and on API
-  const handleSubmit = useCallback(
+  const handleReset = useCallback(
     async (data: ResetPasswordFormData) => {
       try {
         formRef.current?.setErrors({});
@@ -113,19 +106,18 @@ const Recover: React.FC = () => {
         });
 
         const { password, passwordConfirmation } = data;
-        const token = location.search.replace('?token=', '');
 
-        if (!token) {
-          throw new Error();
-        }
-
-        await api.post('/password/reset', {
+        await api.post('/users/reset', {
           password,
           passwordConfirmation,
-          token,
         });
 
-        history.push('/');
+        addToast({
+          type: 'success',
+          title: 'Account password reseted!',
+        });
+
+        history.push('/home');
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
           const errors = getValidationErrors(error);
@@ -143,7 +135,7 @@ const Recover: React.FC = () => {
         });
       }
     },
-    [addToast, history, location.search],
+    [addToast, history],
   );
 
   return (
@@ -168,7 +160,7 @@ const Recover: React.FC = () => {
                   {user.email}
                 </p>
               </Information>
-              <Form ref={formRef} onSubmit={handleSubmit}>
+              <Form ref={formRef} onSubmit={handleReset}>
                 <h1>Reset Password</h1>
 
                 <Input

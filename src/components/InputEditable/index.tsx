@@ -55,6 +55,7 @@ const InputEditable: React.FC<InputProps> = ({ name, text, ...props }) => {
       addToast({
         type: 'error',
         title: 'An error have occurred. Try again later.',
+        description: error,
       });
     }
   }, [
@@ -64,6 +65,7 @@ const InputEditable: React.FC<InputProps> = ({ name, text, ...props }) => {
     setReloadLead,
     setIsLoading,
     name,
+    error,
   ]);
 
   useEffect(() => {

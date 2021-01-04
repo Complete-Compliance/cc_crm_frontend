@@ -1,10 +1,10 @@
 /* eslint-disable react/jsx-one-expression-per-line */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Loading from 'react-loading';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-import { useLocation } from 'react-router-dom';
-import { FiArrowUp } from 'react-icons/fi';
+import { useHistory, useLocation } from 'react-router-dom';
+import { FiArrowUp, FiTrash2 } from 'react-icons/fi';
 import { useLead } from '../../hooks/lead';
 
 import api from '../../services/api';
@@ -18,6 +18,7 @@ import {
   Container,
   LoadingContainer,
   LeadCardsContainer,
+  LeadHeader,
   InformationCard,
   CardHeader,
 } from './styles';
@@ -67,6 +68,7 @@ const Lead: React.FC = () => {
   const location = useLocation();
 
   const formRef = useRef<FormHandles>(null);
+  const history = useHistory();
 
   const {
     reloadLead,
@@ -82,6 +84,12 @@ const Lead: React.FC = () => {
 
   const [leadId, setLeadId] = useState<string>();
   const [lead, setLead] = useState<Lead>();
+
+  const deleteLead = useCallback(() => {
+    api.delete(`/leads/${leadId}`).then(() => {
+      history.push('/leads');
+    });
+  }, [history, leadId]);
 
   useEffect(() => {
     const id = location.pathname.split('/').splice(-1).pop();
@@ -103,9 +111,15 @@ const Lead: React.FC = () => {
       <Container>
         {!isLoading && lead ? (
           <LeadCardsContainer>
-            <h1>
-              Lead USDOT <strong>#{lead.usdot}</strong>
-            </h1>
+            <LeadHeader>
+              <h1>
+                Lead USDOT <strong>#{lead.usdot}</strong>
+              </h1>
+
+              <button type="button" onClick={deleteLead}>
+                <FiTrash2 />
+              </button>
+            </LeadHeader>
 
             <InformationCard id="Personal" isExpanded={isPersonalExpanded}>
               <CardHeader isExpanded={isPersonalExpanded}>
