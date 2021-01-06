@@ -30,6 +30,7 @@ interface Lead {
   // Personal info
   companyName: string | undefined;
   fullName: string | undefined;
+  dbaName: string | undefined;
   entityType: string | undefined;
   phoneNumber: string | undefined;
   operatingStatus: string | undefined;
@@ -121,7 +122,11 @@ const Lead: React.FC = () => {
               </button>
             </LeadHeader>
 
-            <InformationCard id="Personal" isExpanded={isPersonalExpanded}>
+            <InformationCard
+              id="Personal"
+              isExpanded={isPersonalExpanded}
+              height="21em"
+            >
               <CardHeader isExpanded={isPersonalExpanded}>
                 <span>Personal Information</span>
                 <button
@@ -142,6 +147,11 @@ const Lead: React.FC = () => {
                     />
                     <InputEditable
                       text="Full Name"
+                      name="fullName"
+                      defaultValue={lead.fullName}
+                    />
+                    <InputEditable
+                      text="DBA Name"
                       name="fullName"
                       defaultValue={lead.fullName}
                     />

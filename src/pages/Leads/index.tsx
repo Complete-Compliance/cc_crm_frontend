@@ -15,6 +15,7 @@ interface Lead {
   entityType: string | null;
   operatingStatus: string | null;
   companyName: string | null;
+  dbaName: string | null;
   fullName: string | null;
   primaryAddress: string | null;
   state: string | null;
@@ -80,6 +81,7 @@ const Leads: React.FC = () => {
     { field: 'phoneNumber', headerName: 'Phone', width: 200 },
     { field: 'entityType', headerName: 'Entity Type', width: 200 },
     { field: 'operatingStatus', headerName: 'Operating Status', width: 200 },
+    { field: 'dbaName', headerName: 'DBA Name', width: 200 },
     { field: 'fullName', headerName: 'Full name', width: 200 },
     { field: 'companyName', headerName: 'Company Name', width: 200 },
     { field: 'state', headerName: 'State', width: 200 },
@@ -127,7 +129,7 @@ const Leads: React.FC = () => {
           }}
           rows={leads}
           columns={columns}
-          pageSize={15}
+          pageSize={50}
           density="compact"
           headerHeight={40}
           scrollbarSize={7}

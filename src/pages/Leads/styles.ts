@@ -4,7 +4,7 @@ export const Container = styled.div``;
 
 export const Content = styled.div`
   width: 100%;
-  height: 600px;
+  height: 650px;
 
   .MuiDataGrid-root {
     font-size: 1em;
@@ -97,7 +97,9 @@ export const Content = styled.div`
     color: #ba382f;
   }
 
-  .MuiTablePagination-caption {
+  .MuiTablePagination-caption,
+  .MuiTablePagination-select,
+  .MuiSelect-selectMenu {
     font-size: 2em;
   }
 
