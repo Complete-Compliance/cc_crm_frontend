@@ -48,16 +48,24 @@ interface Lead {
 const Leads: React.FC = () => {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [rowCount, setRowCount] = useState(0);
   const { addToast } = useToast();
 
   const history = useHistory();
 
   useEffect(() => {
-    api.get('/leads').then(response => {
+    api.get(`/leads?page=${currentPage}`).then(response => {
       setLeads(response.data);
       setIsLoading(false);
     });
-  }, [history]);
+  }, [history, currentPage]);
+
+  useEffect(() => {
+    api.get('/leads/count/all').then(response => {
+      setRowCount(response.data);
+    });
+  }, []);
 
   const columns = [
     {
@@ -132,15 +140,21 @@ const Leads: React.FC = () => {
           pageSize={50}
           density="compact"
           headerHeight={40}
+          paginationMode="server"
+          rowCount={rowCount}
           scrollbarSize={7}
           loading={isLoading}
           disableSelectionOnClick
+          page={currentPage}
+          onPageChange={params => {
+            setCurrentPage(params.page);
+          }}
           onCellClick={(params: CellParams) => {
             if (params.field === 'view') {
               return;
             }
             navigator.clipboard.writeText(String(params.value));
-            console.log(params);
+
             addToast({
               type: 'info',
               title: `Value of ${params.colDef.headerName} copied to clipboard`,
