@@ -55,11 +55,14 @@ const Leads: React.FC = () => {
   const history = useHistory();
 
   useEffect(() => {
+    if (rowCount === 0) {
+      return;
+    }
     api.get(`/leads?page=${currentPage}`).then(response => {
       setLeads(response.data);
       setIsLoading(false);
     });
-  }, [history, currentPage]);
+  }, [history, currentPage, rowCount]);
 
   useEffect(() => {
     api.get('/leads/count/all').then(response => {
@@ -148,7 +151,9 @@ const Leads: React.FC = () => {
           page={currentPage}
           onPageChange={params => {
             setCurrentPage(params.page);
-            setIsLoading(true);
+            if (Number(params.page) > 1) {
+              setIsLoading(true);
+            }
           }}
           onCellClick={(params: CellParams) => {
             if (params.field === 'view') {
