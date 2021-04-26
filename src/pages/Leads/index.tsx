@@ -1,13 +1,27 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
 import { CellParams, DataGrid } from '@material-ui/data-grid';
-import { FiExternalLink } from 'react-icons/fi';
+import { RadioGroup, Radio, FormControlLabel } from '@material-ui/core';
+import { FormHandles } from '@unform/core';
+import { Form } from '@unform/web';
+import { FiExternalLink, FiArrowUp } from 'react-icons/fi';
+import * as Yup from 'yup';
 import AppHeader from '../../components/AppHeader';
 import NoRowsOverlay from './components/NoRowsOverlay';
 import { useToast } from '../../hooks/toast';
 import api from '../../services/api';
+import getValidationErrors from '../../utils/getValidationErrors';
 
-import { Container, Content, ViewMoreButton } from './styles';
+import {
+  Container,
+  Content,
+  ViewMoreButton,
+  FiltersContainer,
+  CardHeader,
+  InformationCard,
+} from './styles';
+import Input from '../../components/Input';
+import Button from '../../components/Button';
 
 interface Lead {
   id: string;
@@ -43,13 +57,22 @@ interface Lead {
   cancellationDate: string | null;
 }
 
-// https://material-ui.com/pt/api/data-grid/
-// https://material-ui.com/pt/components/data-grid/rendering/
+interface SearchDotFormData {
+  dot: string;
+}
+
 const Leads: React.FC = () => {
+  const formRef = useRef<FormHandles>(null);
+
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [rowCount, setRowCount] = useState(0);
+  const [dotSearchCriteria, setDotSearchCriteria] = useState('contains');
+  const [isFiltered, setIsFiltered] = useState(false);
+
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
+
   const { addToast } = useToast();
 
   const history = useHistory();
@@ -58,11 +81,14 @@ const Leads: React.FC = () => {
     if (rowCount === 0) {
       return;
     }
+    if (isFiltered === true) {
+      return;
+    }
     api.get(`/leads?page=${currentPage}`).then(response => {
       setLeads(response.data);
       setIsLoading(false);
     });
-  }, [history, currentPage, rowCount]);
+  }, [history, currentPage, rowCount, isFiltered]);
 
   useEffect(() => {
     api.get('/leads/count/all').then(response => {
@@ -129,11 +155,107 @@ const Leads: React.FC = () => {
     { field: 'cancellationDate', headerName: 'Cancellation Date', width: 200 },
   ];
 
+  const onRadioChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setDotSearchCriteria(event.target.value);
+    },
+    [],
+  );
+
+  const onSearchSubmit = useCallback(
+    async (data: SearchDotFormData) => {
+      try {
+        formRef.current?.setErrors({});
+
+        const schema = Yup.object().shape({
+          dot: Yup.number().required('Start search required'),
+        });
+
+        await schema.validate(data, {
+          abortEarly: false,
+        });
+
+        await api
+          .post(`/leads/find?searchCriteria=${dotSearchCriteria}`, {
+            dot: data.dot,
+          })
+          .then(response => {
+            console.log(response.data);
+            setLeads(response.data);
+            setIsFiltered(true);
+          });
+      } catch (error) {
+        if (error instanceof Yup.ValidationError) {
+          const errors = getValidationErrors(error);
+
+          formRef.current?.setErrors(errors);
+
+          return;
+        }
+
+        addToast({
+          type: 'error',
+          title: 'Search error',
+          description: `An error have occurred: ${error.message}`,
+        });
+      }
+    },
+    [addToast, dotSearchCriteria],
+  );
+
   return (
     <Container>
       <AppHeader />
 
       <Content>
+        <InformationCard
+          id="Filters"
+          isExpanded={isFiltersExpanded}
+          height="16em"
+        >
+          <CardHeader isExpanded={isFiltersExpanded}>
+            <span>Search Filters</span>
+            <button
+              type="button"
+              onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+            >
+              <FiArrowUp />
+            </button>
+          </CardHeader>
+
+          <FiltersContainer isExpanded={isFiltersExpanded}>
+            <Form ref={formRef} onSubmit={onSearchSubmit}>
+              <RadioGroup
+                aria-label="Search Type"
+                value={dotSearchCriteria}
+                row
+                onChange={onRadioChange}
+              >
+                <FormControlLabel
+                  value="contains"
+                  control={<Radio />}
+                  label="Contains"
+                />
+                <FormControlLabel
+                  value="exact"
+                  control={<Radio />}
+                  label="Exact"
+                />
+              </RadioGroup>
+              <section>
+                <Input type="text" name="dot" placeholder="USDOT N#" />
+                <Button type="submit">Search</Button>
+              </section>
+            </Form>
+          </FiltersContainer>
+
+          {isFiltered && (
+            <Button type="button" onClick={() => setIsFiltered(false)}>
+              Remove Search Filters
+            </Button>
+          )}
+        </InformationCard>
+
         <DataGrid
           components={{
             noRowsOverlay: NoRowsOverlay,
@@ -142,9 +264,10 @@ const Leads: React.FC = () => {
           columns={columns}
           pageSize={50}
           density="compact"
-          headerHeight={40}
+          headerHeight={60}
           paginationMode="server"
           rowCount={rowCount}
+          rowsPerPageOptions={[]}
           scrollbarSize={7}
           loading={isLoading}
           disableSelectionOnClick
