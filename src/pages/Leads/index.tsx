@@ -148,6 +148,7 @@ const Leads: React.FC = () => {
           page={currentPage}
           onPageChange={params => {
             setCurrentPage(params.page);
+            setIsLoading(true);
           }}
           onCellClick={(params: CellParams) => {
             if (params.field === 'view') {
