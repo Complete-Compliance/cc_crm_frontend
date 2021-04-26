@@ -171,7 +171,7 @@ const Home: React.FC = () => {
       <AppHeader />
 
       <Content>
-        <h1>Scrap Process List</h1>
+        <h1>Lead Update</h1>
         <ScrapProcess>
           <Form ref={formRef} onSubmit={handleSubmit}>
             <div>
