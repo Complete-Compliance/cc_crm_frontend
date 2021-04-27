@@ -211,6 +211,12 @@ const Leads: React.FC = () => {
     [addToast, dotSearchCriteria],
   );
 
+  const handleRemoveFilters = useCallback(() => {
+    setIsFiltered(false);
+    setIsLoading(true);
+    setCurrentFilter('');
+  }, []);
+
   return (
     <Container>
       <AppHeader />
@@ -258,7 +264,7 @@ const Leads: React.FC = () => {
           </FiltersContainer>
 
           {isFiltered && (
-            <Button type="button" onClick={() => setIsFiltered(false)}>
+            <Button type="button" onClick={handleRemoveFilters}>
               Remove Search Filters
             </Button>
           )}
