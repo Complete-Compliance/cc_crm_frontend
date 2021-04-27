@@ -72,6 +72,7 @@ const Leads: React.FC = () => {
   const [isFiltered, setIsFiltered] = useState(false);
 
   const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
+  const [currentFilter, setCurrentFilter] = useState('');
 
   const { addToast } = useToast();
 
@@ -91,10 +92,13 @@ const Leads: React.FC = () => {
   }, [history, currentPage, rowCount, isFiltered]);
 
   useEffect(() => {
+    if (isFiltered === true) {
+      return;
+    }
     api.get('/leads/count/all').then(response => {
       setRowCount(response.data);
     });
-  }, []);
+  }, [isFiltered]);
 
   const columns = [
     {
@@ -175,14 +179,18 @@ const Leads: React.FC = () => {
           abortEarly: false,
         });
 
+        setIsLoading(true);
+
         await api
-          .post(`/leads/find?searchCriteria=${dotSearchCriteria}`, {
-            dot: data.dot,
-          })
+          .get(
+            `/leads/find?searchCriteria=${dotSearchCriteria}&page=1&dot=${data.dot}`,
+          )
           .then(response => {
-            console.log(response.data);
-            setLeads(response.data);
+            setLeads(response.data.leads);
             setIsFiltered(true);
+            setRowCount(response.data.leadsCount);
+            setCurrentFilter(data.dot);
+            setIsLoading(false);
           });
       } catch (error) {
         if (error instanceof Yup.ValidationError) {
@@ -272,12 +280,27 @@ const Leads: React.FC = () => {
           loading={isLoading}
           disableSelectionOnClick
           page={currentPage}
-          onPageChange={params => {
-            setCurrentPage(params.page);
-            if (Number(params.page) > 1) {
-              setIsLoading(true);
-            }
-          }}
+          onPageChange={
+            isFiltered
+              ? params => {
+                  setCurrentPage(params.page);
+                  setIsLoading(true);
+                  api
+                    .get(
+                      `/leads/find?searchCriteria=${dotSearchCriteria}&page=${params.page}&dot=${currentFilter}`,
+                    )
+                    .then(response => {
+                      setLeads(response.data.leads);
+                      setIsLoading(false);
+                    });
+                }
+              : params => {
+                  setCurrentPage(params.page);
+                  if (Number(params.page) > 1) {
+                    setIsLoading(true);
+                  }
+                }
+          }
           onCellClick={(params: CellParams) => {
             if (params.field === 'view') {
               return;

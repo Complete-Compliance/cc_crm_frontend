@@ -187,6 +187,7 @@ const Home: React.FC = () => {
           rows={scrapProcesses}
           density="compact"
           columns={columns}
+          disableSelectionOnClick
           loading={isLoading}
           sortModel={[
             {
