@@ -257,7 +257,7 @@ const Leads: React.FC = () => {
                 />
               </RadioGroup>
               <section>
-                <Input type="text" name="dot" placeholder="USDOT N#" />
+                <Input type="text" name="dot" placeholder="USDOT #" />
                 <Button type="submit">Search</Button>
               </section>
             </Form>
