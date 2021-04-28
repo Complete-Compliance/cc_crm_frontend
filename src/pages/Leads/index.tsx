@@ -142,15 +142,34 @@ const Leads: React.FC = () => {
     { field: 'email', headerName: 'E-mail', width: 200 },
     {
       field: 'bipdInsuranceRequired',
-      headerName: 'BIPD Insurance',
+      headerName: 'BIPD Insurance Required',
+      width: 200,
+    },
+    {
+      field: 'bipdInsuranceOnFile',
+      headerName: 'BIPD Insurance On File',
       width: 200,
     },
     {
       field: 'cargoInsuranceRequired',
-      headerName: 'Cargo Insurance',
+      headerName: 'Cargo Insurance Required',
       width: 200,
     },
-    { field: 'bondInsuranceRequired', headerName: 'Company Name', width: 200 },
+    {
+      field: 'cargoInsuranceOnFile',
+      headerName: 'Cargo Insurance On File',
+      width: 200,
+    },
+    {
+      field: 'bondInsuranceRequired',
+      headerName: 'Bond Insurance Required',
+      width: 200,
+    },
+    {
+      field: 'bondInsuranceOnFile',
+      headerName: 'Bond Insurance On File',
+      width: 200,
+    },
     { field: 'insuranceCarrier', headerName: 'Insurance Carrier', width: 200 },
     { field: 'policySurety', headerName: 'Policy Surety', width: 200 },
     { field: 'postedDate', headerName: 'Posted Date', width: 200 },
