@@ -48,6 +48,9 @@ interface Lead {
   bipdInsuranceRequired: string | null;
   cargoInsuranceRequired: string | null;
   bondInsuranceRequired: string | null;
+  bipdInsuranceOnFile: string | null;
+  cargoInsuranceOnFile: string | null;
+  bondInsuranceOnFile: string | null;
   insuranceCarrier: string | null;
   policySurety: string | null;
   postedDate: string | null;
