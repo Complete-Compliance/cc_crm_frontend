@@ -122,6 +122,7 @@ const Leads: React.FC = () => {
     { field: 'phoneNumber', headerName: 'Phone', width: 200 },
     { field: 'entityType', headerName: 'Entity Type', width: 200 },
     { field: 'operatingStatus', headerName: 'Operating Status', width: 200 },
+    { field: 'carrierOperation', headerName: 'Carrier Operation', width: 200 },
     { field: 'dbaName', headerName: 'DBA Name', width: 200 },
     { field: 'fullName', headerName: 'Full name', width: 200 },
     { field: 'companyName', headerName: 'Company Name', width: 200 },
