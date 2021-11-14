@@ -173,7 +173,7 @@ const SearchLeads: React.FC = () => {
   return (
     <Container>
       <Content>
-        <h1>Lead Update</h1>
+        <h1>Search Leads by DOT Range</h1>
         <ScrapProcess>
           <Form ref={formRef} onSubmit={handleSubmit}>
             <div>

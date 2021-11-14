@@ -5,11 +5,7 @@ interface ActionButtonProps {
   deletable?: string;
 }
 
-export const Container = styled.div`
-  & + div {
-    margin: 200px 0 30px 0;
-  }
-`;
+export const Container = styled.div``;
 
 export const Content = styled.main`
   max-width: 1120px;
