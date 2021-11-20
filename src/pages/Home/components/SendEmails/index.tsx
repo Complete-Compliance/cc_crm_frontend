@@ -1,28 +1,32 @@
 import React, { useCallback, useRef } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
-// import * as Yup from 'yup';
 import { DataGrid } from '@material-ui/data-grid';
 import { useEffect } from 'react';
 import { useState } from 'react';
+import Loading from 'react-loading';
 import Button from '../../../../components/Button';
-import Input from '../../../../components/Input';
-// import { useToast } from '../../../../hooks/toast';
-import NoRowsOverlay from '../NoRowsOverlay';
+import { useToast } from '../../../../hooks/toast';
 import api from '../../../../services/api';
-// import getValidationErrors from '../../../../utils/getValidationErrors';
+import { sendMail } from '../../../../services/sendMail';
+import NoRowsOverlay from '../NoRowsOverlay';
 
-import { Container, Content, FormContent } from './styles';
+import { Container, Content, FormContent, LoadingContainer } from './styles';
 
 interface Lead {
   id: string;
   usdot: string;
+  companyName: string;
   email: string;
 }
 
-interface SendEmailsFormData {
-  templateName: string;
-  emails: string[];
+interface ISendEmailsData {
+  email: string;
+  mailTo: string;
+  subject: string;
+  variables: {
+    [key: string]: number | string;
+  };
 }
 
 interface IResponse {
@@ -31,7 +35,7 @@ interface IResponse {
 
 const SendEmails: React.FC = () => {
   const formRef = useRef<FormHandles>(null);
-  // const { addToast } = useToast();
+  const { addToast } = useToast();
 
   const [currentPage, setCurrentPage] = useState(1);
   const [leads, setLeads] = useState<Lead[]>([]);
@@ -49,72 +53,61 @@ const SendEmails: React.FC = () => {
   }, [currentPage]);
 
   const handleSubmit = useCallback(
-    async (data: SendEmailsFormData) => {
+    async _data => {
       setResetEmailSelection(false);
 
-      const emails = leads.reduce((acc: string[], lead: Lead) => {
+      const mailData = leads.reduce((acc: ISendEmailsData[], lead: Lead) => {
         if (selectedIds.includes(lead.id)) {
-          acc.push(lead.email);
+          const data = {
+            email: lead.email,
+            mailTo: lead.companyName,
+            subject: 'ACTION REQUIRED - Not Authorized',
+            variables: {
+              usdot: lead.usdot,
+              companyName: lead.companyName,
+            },
+          };
+
+          acc.push(data);
         }
 
         return acc;
       }, []);
 
-      console.log(emails);
+      const sendMailData = { templateName: 'standard', mailData };
 
-      setTimeout(() => setResetEmailSelection(true), 2000);
+      try {
+        await sendMail(sendMailData);
 
-      // TO DO
-      // [] verify if the data.emails is empty
-      // [] call by the end: setResetEmailSelection(true) and setSelectedIds([])
+        setSelectedIds([]);
+        setResetEmailSelection(true);
 
-      // try {
-      //   formRef.current?.setErrors({});
+        addToast({
+          type: 'success',
+          title: 'Search Emails Process Created',
+          description:
+            'You can run the process on the list, if there is no running process.',
+        });
+      } catch (err) {
+        console.log(err);
 
-      //   const schema = Yup.object().shape({
-      //     startDot: Yup.string().required('Start search required'),
-      //     endDot: Yup.string().required('Start search required'),
-      //   });
+        setSelectedIds([]);
+        setResetEmailSelection(true);
 
-      //   await schema.validate(data, {
-      //     abortEarly: false,
-      //   });
-
-      //   Object.assign(data, { category: 'search_emails' });
-
-      //   await api.post('/scrapProcesses', data);
-
-      //   setReloadProcessList(true);
-      //   setIsLoading(true);
-
-      //   addToast({
-      //     type: 'success',
-      //     title: 'Search Emails Process Created',
-      //     description:
-      //       'You can run the process on the list, if there is no running process.',
-      //   });
-      // } catch (error) {
-      //   if (error instanceof Yup.ValidationError) {
-      //     const errors = getValidationErrors(error);
-
-      //     formRef.current?.setErrors(errors);
-
-      //     return;
-      //   }
-
-      //   addToast({
-      //     type: 'error',
-      //     title: 'Search Emails Process Error',
-      //     description:
-      //       'An error have occurred in creating the process. Try again, please.',
-      //   });
-      // }
+        addToast({
+          type: 'error',
+          title: 'Search Emails Process Error',
+          description:
+            'An error have occurred in creating the process. Try again, please.',
+        });
+      }
     },
-    [selectedIds, leads],
+    [selectedIds, leads, addToast],
   );
 
   const columns = [
     { field: 'usdot', headerName: 'USDOT', width: 200 },
+    { field: 'companyName', headerName: 'Company Name', width: 200 },
     { field: 'email', headerName: 'E-mail', width: 200 },
   ];
 
@@ -122,42 +115,49 @@ const SendEmails: React.FC = () => {
     <Container>
       <Content>
         <h1>Send E-mails</h1>
-        <FormContent>
-          <Form ref={formRef} onSubmit={handleSubmit}>
-            <div>
-              {/** ADD HERE ONE RADIO WITH TEMPLATE NAMES */}
-              <Button type="submit">Send Emails</Button>
-            </div>
-          </Form>
-        </FormContent>
 
-        {resetEmailSelection && (
-          <DataGrid
-            components={{ noRowsOverlay: NoRowsOverlay }}
-            rows={leads}
-            density="compact"
-            columns={columns}
-            onSelectionChange={param => {
-              setSelectedIds(param.rowIds as string[]);
-            }}
-            page={currentPage}
-            paginationMode="server"
-            disableSelectionOnClick
-            checkboxSelection
-            onPageChange={params => {
-              setCurrentPage(params.page);
-              if (Number(params.page) > 1) {
-                setIsLoading(true);
-              }
-            }}
-            loading={isLoading}
-            sortModel={[
-              {
-                field: 'usdot',
-                sort: 'desc',
-              },
-            ]}
-          />
+        {resetEmailSelection ? (
+          <>
+            <FormContent>
+              <Form ref={formRef} onSubmit={handleSubmit}>
+                <div>
+                  {/** ADD HERE ONE RADIO WITH TEMPLATE NAMES WHEN TIME COMES */}
+                  <Button type="submit">Send Emails</Button>
+                </div>
+              </Form>
+            </FormContent>
+
+            <DataGrid
+              components={{ noRowsOverlay: NoRowsOverlay }}
+              rows={leads}
+              density="compact"
+              columns={columns}
+              onSelectionChange={param => {
+                setSelectedIds(param.rowIds as string[]);
+              }}
+              page={currentPage}
+              paginationMode="server"
+              disableSelectionOnClick
+              checkboxSelection
+              onPageChange={params => {
+                setCurrentPage(params.page);
+                if (Number(params.page) > 1) {
+                  setIsLoading(true);
+                }
+              }}
+              loading={isLoading}
+              sortModel={[
+                {
+                  field: 'usdot',
+                  sort: 'desc',
+                },
+              ]}
+            />
+          </>
+        ) : (
+          <LoadingContainer>
+            <Loading type="spokes" color="white" height={150} width={75} />
+          </LoadingContainer>
         )}
       </Content>
     </Container>

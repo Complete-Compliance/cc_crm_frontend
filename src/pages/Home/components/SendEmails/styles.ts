@@ -13,6 +13,20 @@ export const Container = styled.div`
   }
 `;
 
+export const LoadingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  > div {
+    display: inline-block;
+    margin: 48px auto;
+  }
+
+  height: 180;
+  width: 90;
+`;
+
 export const Content = styled.main`
   max-width: 1120px;
   height: 450px;
