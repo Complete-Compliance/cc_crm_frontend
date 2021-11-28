@@ -2,16 +2,26 @@ import React, { useCallback, useRef } from 'react';
 import { FormHandles } from '@unform/core';
 import { Form } from '@unform/web';
 import { DataGrid } from '@material-ui/data-grid';
+import { FiArrowUp } from 'react-icons/fi';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import Loading from 'react-loading';
+import { RadioGroup, Radio, FormControlLabel } from '@material-ui/core';
 import Button from '../../../../components/Button';
 import { useToast } from '../../../../hooks/toast';
 import api from '../../../../services/api';
 import { sendMail } from '../../../../services/sendMail';
 import NoRowsOverlay from '../NoRowsOverlay';
 
-import { Container, Content, FormContent, LoadingContainer } from './styles';
+import {
+  Container,
+  CardHeader,
+  InformationCard,
+  FiltersContainer,
+  Content,
+  FormContent,
+  LoadingContainer,
+} from './styles';
 
 interface Lead {
   id: string;
@@ -40,17 +50,23 @@ const SendEmails: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [leads, setLeads] = useState<Lead[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [emailType, setEmailType] = useState('authorized');
+  const [formEmailType, setFormEmailType] = useState('authorized');
   const [resetEmailSelection, setResetEmailSelection] = useState(true);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isFiltersExpanded, setIsFiltersExpanded] = useState(false);
+  const [isFiltered, setIsFiltered] = useState(false);
 
   useEffect(() => {
-    api
-      .get(`/leads?page=${currentPage}&searchCriteria=email`)
-      .then((response: IResponse) => {
-        setLeads(response.data);
-        setIsLoading(false);
-      });
-  }, [currentPage]);
+    if (!isFiltered) {
+      api
+        .get(`/leads?page=${currentPage}&searchCriteria=email`)
+        .then((response: IResponse) => {
+          setLeads(response.data);
+          setIsLoading(false);
+        });
+    }
+  }, [currentPage, isFiltered]);
 
   const handleSubmit = useCallback(
     async _data => {
@@ -74,7 +90,7 @@ const SendEmails: React.FC = () => {
         return acc;
       }, []);
 
-      const sendMailData = { templateName: 'standard', mailData };
+      const sendMailData = { templateName: formEmailType, mailData };
 
       try {
         await sendMail(sendMailData);
@@ -102,8 +118,45 @@ const SendEmails: React.FC = () => {
         });
       }
     },
-    [selectedIds, leads, addToast],
+    [selectedIds, leads, addToast, formEmailType],
   );
+
+  const onRadioChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setEmailType(event.target.value);
+      setFormEmailType(event.target.value);
+    },
+    [],
+  );
+
+  const onFormRadioChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setFormEmailType(event.target.value);
+    },
+    [],
+  );
+
+  const searchWithFilters = useCallback(
+    async data => {
+      setIsFiltered(true);
+      setIsLoading(true);
+
+      api
+        .get(
+          `/leads?page=${currentPage}&searchCriteria=email&emailType=${emailType}`,
+        )
+        .then((response: IResponse) => {
+          setLeads(response.data);
+          setIsLoading(false);
+        });
+    },
+    [emailType, currentPage],
+  );
+
+  const handleRemoveFilters = useCallback(() => {
+    setIsFiltered(false);
+    setIsLoading(true);
+  }, []);
 
   const columns = [
     { field: 'usdot', headerName: 'USDOT', width: 200 },
@@ -120,12 +173,85 @@ const SendEmails: React.FC = () => {
           <>
             <FormContent>
               <Form ref={formRef} onSubmit={handleSubmit}>
+                <RadioGroup
+                  aria-label="Email Type"
+                  value={formEmailType}
+                  row
+                  onChange={onFormRadioChange}
+                >
+                  <FormControlLabel
+                    value="mcs150Outdated"
+                    control={<Radio />}
+                    label="MCS150 Outdated"
+                  />
+                  <FormControlLabel
+                    value="authorized"
+                    control={<Radio />}
+                    label="Authorized"
+                  />
+                  <FormControlLabel
+                    value="notAuthorized"
+                    control={<Radio />}
+                    label="Not Authorized"
+                  />
+                </RadioGroup>
                 <div>
-                  {/** ADD HERE ONE RADIO WITH TEMPLATE NAMES WHEN TIME COMES */}
                   <Button type="submit">Send Emails</Button>
                 </div>
               </Form>
             </FormContent>
+
+            <InformationCard
+              id="Filters"
+              isExpanded={isFiltersExpanded}
+              height="16em"
+            >
+              <CardHeader isExpanded={isFiltersExpanded}>
+                <span>Search Filters</span>
+                <button
+                  type="button"
+                  onClick={() => setIsFiltersExpanded(!isFiltersExpanded)}
+                >
+                  <FiArrowUp />
+                </button>
+              </CardHeader>
+
+              <FiltersContainer isExpanded={isFiltersExpanded}>
+                <Form ref={formRef} onSubmit={searchWithFilters}>
+                  <RadioGroup
+                    aria-label="Search Type"
+                    value={emailType}
+                    row
+                    onChange={onRadioChange}
+                  >
+                    <FormControlLabel
+                      value="mcs150Outdated"
+                      control={<Radio />}
+                      label="MCS150 Outdated"
+                    />
+                    <FormControlLabel
+                      value="authorized"
+                      control={<Radio />}
+                      label="Authorized"
+                    />
+                    <FormControlLabel
+                      value="notAuthorized"
+                      control={<Radio />}
+                      label="Not Authorized"
+                    />
+                  </RadioGroup>
+                  <section>
+                    <Button type="submit">Search</Button>
+                  </section>
+                </Form>
+              </FiltersContainer>
+
+              {isFiltered && (
+                <Button type="button" onClick={handleRemoveFilters}>
+                  Remove Search Filters
+                </Button>
+              )}
+            </InformationCard>
 
             <DataGrid
               components={{ noRowsOverlay: NoRowsOverlay }}

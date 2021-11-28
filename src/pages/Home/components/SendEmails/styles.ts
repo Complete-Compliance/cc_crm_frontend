@@ -1,8 +1,17 @@
-import styled, { css } from 'styled-components';
+import styled, { css, keyframes } from 'styled-components';
 
 interface ActionButtonProps {
   status?: string;
   deletable?: string;
+}
+
+interface InformationCardProps {
+  isExpanded: boolean;
+  height?: string;
+}
+
+interface CardHeaderProps {
+  isExpanded: boolean;
 }
 
 export const Container = styled.div`
@@ -10,6 +19,118 @@ export const Container = styled.div`
 
   @media (min-width: 1024px) {
     margin-top: 264px;
+  }
+`;
+
+const blurEffectIn = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
+export const InformationCard = styled.div<InformationCardProps>`
+  display: flex;
+  flex-direction: column;
+
+  width: 20em;
+  background-color: #28262e;
+
+  margin: 1em 0;
+
+  border-radius: 20px;
+
+  ${props =>
+    props.isExpanded
+      ? css`
+          height: ${props.height ? props.height : '18em'};
+          transition: all 0.5s ease-in-out;
+          form {
+            section {
+              animation: ${blurEffectIn} 0.7s;
+            }
+          }
+        `
+      : css`
+          height: 3em;
+          transition: all 0.5s ease-in-out;
+          form {
+            section {
+              opacity: 0;
+            }
+          }
+        `}
+
+  @media (min-width: 1024px) {
+    width: 60em;
+  }
+`;
+
+export const CardHeader = styled.div<CardHeaderProps>`
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  width: 100%;
+  height: 40px;
+
+  button {
+    background: transparent;
+    border: 0;
+
+    svg {
+      margin: 1em 1.6em 0 0;
+
+      transition: all 0.6s;
+
+      color: #f3f3f3;
+
+      width: 20px;
+      height: 20px;
+
+      ${props =>
+        props.isExpanded
+          ? css`
+              transform: rotate(0deg);
+            `
+          : css`
+              transform: rotate(-180deg);
+            `}
+    }
+  }
+  span {
+    margin: 0.4em 0 0 1.6em;
+    font-size: 1.4em;
+    color: #ba382f;
+  }
+`;
+
+export const FiltersContainer = styled.div<CardHeaderProps>`
+  display: flex;
+  flex-direction: row;
+
+  margin-left: 30px;
+
+  width: 800px;
+
+  ${props =>
+    !props.isExpanded &&
+    css`
+      display: none;
+    `}
+
+  form {
+    margin-left: 10px;
+
+    display: flex;
+    flex-direction: column;
+    section {
+      div {
+        margin-top: 0;
+      }
+    }
   }
 `;
 
@@ -146,6 +267,14 @@ export const FormContent = styled.div`
 
   align-items: center;
   justify-content: center;
+
+  .PrivateSwitchBase-input-4 {
+    width: 2rem;
+  }
+
+  .PrivateRadioButtonIcon-root-5 {
+    width: 2rem;
+  }
 
   form {
     max-width: 300px;
