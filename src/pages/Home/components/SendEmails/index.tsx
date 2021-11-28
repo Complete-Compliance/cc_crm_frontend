@@ -72,12 +72,31 @@ const SendEmails: React.FC = () => {
     async _data => {
       setResetEmailSelection(false);
 
+      let subject = '';
+      switch (formEmailType) {
+        case 'authorized': {
+          subject = 'FMCSA Company Profile Update';
+          break;
+        }
+        case 'notAuthorized': {
+          subject = 'ACTION REQUIRED - Not Authorized';
+          break;
+        }
+        case 'mcs150Outdated': {
+          subject = 'ACTION REQUIRED - MCS150 update needed';
+          break;
+        }
+        default: {
+          throw new Error('Invalid email type');
+        }
+      }
+
       const mailData = leads.reduce((acc: ISendEmailsData[], lead: Lead) => {
         if (selectedIds.includes(lead.id)) {
           const data = {
             email: lead.email,
             mailTo: lead.companyName,
-            subject: 'ACTION REQUIRED - Not Authorized',
+            subject,
             variables: {
               usdot: lead.usdot,
               companyName: lead.companyName,
